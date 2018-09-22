@@ -1,7 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const project = require('./aurelia_project/aurelia.json');
 var webpack = require('webpack');
 const {
@@ -75,10 +75,11 @@ module.exports = ({
             test: /\.html$/i
           }]
         }],
-        use: extractCss ? ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: cssRules
-        }) : ['style-loader', ...cssRules],
+        use: extractCss ? [{
+            loader: MiniCssExtractPlugin.loader
+          },
+          'css-loader'
+        ] : ['style-loader', ...cssRules]
       },
       {
         test: /\.css$/i,
@@ -194,7 +195,7 @@ module.exports = ({
         baseUrl
       }
     }),
-    ...when(extractCss, new ExtractTextPlugin({
+    ...when(extractCss, new MiniCssExtractPlugin({
       filename: production ? '[contenthash].css' : '[id].css',
       allChunks: true
     })),
